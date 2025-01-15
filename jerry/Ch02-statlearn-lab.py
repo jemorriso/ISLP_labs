@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib.pyplot import subplots
 
 print("fit a model with", 11, "variables")
@@ -228,3 +229,140 @@ idx_mixed = np.ix_([1, 3], keep_cols)
 A[idx_mixed]
 
 # ## loading data
+
+Auto = pd.read_csv("Auto.csv")
+Auto
+
+Auto = pd.read_csv("Auto.data", delim_whitespace=True)
+Auto
+
+Auto["horsepower"]
+
+np.unique(Auto["horsepower"])
+
+Auto = pd.read_csv("Auto.data", na_values=["?"], delim_whitespace=True)
+Auto["horsepower"].sum()
+
+Auto.shape
+
+Auto_new = Auto.dropna()
+Auto_new.shape
+
+Auto = Auto_new
+Auto.columns
+
+# first 3 rows
+Auto[:3]
+
+# using a boolean array to return matching rows
+idx_80 = Auto["year"] > 80
+idx_80
+Auto[idx_80]
+
+# column subset
+Auto[["mpg", "horsepower"]]
+
+# we did not specify an index when we loaded the data so it's just integers
+Auto.index
+
+Auto_re = Auto.set_index("name")
+Auto_re
+Auto_re.columns
+Auto_re.index
+
+rows = ["amc rebel sst", "ford torino"]
+# access rows by name now that we set the index
+Auto_re.loc[rows]
+
+# similar to numpy
+# rows
+Auto_re.iloc[[3, 4]]
+# columns
+Auto_re.iloc[:, [0, 2, 3]]
+
+# rows and columns
+Auto_re.iloc[[3, 4], [0, 2, 3]]
+
+Auto_re.loc["ford galaxie 500", ["mpg", "origin"]]
+
+# these do the same
+# a
+idx_80 = Auto_re["year"] > 80
+Auto_re.loc[idx_80, ["weight", "origin"]]
+# b is more concise
+Auto_re.loc[lambda df: df["year"] > 80, ["weight", "origin"]]
+
+# & is element-wise 'and' operation, | is element-wise 'or'
+Auto_re.loc[lambda df: (df["year"] > 80) & (df["mpg"] > 30), ["weight", "origin"]]
+Auto_re.loc[
+    lambda df: (df["displacement"] < 300)
+    & (df.index.str.contains("ford") | df.index.str.contains("datsun")),
+    ["weight", "origin"],
+]
+
+# > In summary, a powerful set of operations is available to index the rows and columns of data frames. For integer based queries, use the `iloc[]` method. For string and Boolean
+# > selections, use the `loc[]` method. For functional queries that filter rows, use the `loc[]` method
+# > with a function (typically a `lambda`) in the rows argument.
+
+# ---
+
+rng = np.random.default_rng(1)
+A = rng.standard_normal((127, 5))
+A
+
+M = rng.choice([0, np.nan], p=[0.8, 0.2], size=A.shape)
+M
+
+A += M
+A
+
+D = pd.DataFrame(A, columns=["food", "bar", "pickle", "snack", "popcorn"])
+D[:3]
+
+for col in D.columns:
+    template = 'Column "{0}" has {1:.2%} missing values'
+    print(template.format(col, np.isnan(D[col]).mean()))
+
+np.isnan(D["food"])
+# we use the mean of the true / false array, which makes sense when you remember they are just ones and zeroes
+np.isnan(D["food"]).mean()
+
+# ## Additional Graphical and Numerical Summaries
+
+fig, ax = subplots(figsize=(8, 8))
+ax.plot(Auto["horsepower"], Auto["mpg"], "o")
+plt.show()
+
+# easier syntax
+ax = Auto.plot.scatter("horsepower", "mpg")
+ax.set_title("Horsepower vs. MPG")
+plt.show()
+
+fig = ax.figure
+fig.savefig("output/horsepower_mpg.png")
+
+fig, axes = subplots(ncols=3, figsize=(15, 5))
+Auto.plot.scatter("horsepower", "mpg", ax=axes[1])
+plt.show()
+
+Auto.cylinders = pd.Series(Auto.cylinders, dtype="category")
+Auto.cylinders.dtype
+
+fig, ax = subplots(figsize=(8, 8))
+Auto.boxplot("mpg", by="cylinders", ax=ax)
+plt.show()
+
+fig, ax = subplots(figsize=(8, 8))
+Auto.hist("mpg", ax=ax)
+plt.show()
+
+pd.plotting.scatter_matrix(Auto)
+plt.show()
+
+pd.plotting.scatter_matrix(Auto[["mpg", "displacement", "weight"]])
+plt.show()
+
+Auto[["mpg", "weight"]].describe()
+
+Auto["cylinders"].describe()
+Auto["mpg"].describe()
