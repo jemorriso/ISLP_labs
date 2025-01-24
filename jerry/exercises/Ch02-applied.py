@@ -1,21 +1,23 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 plt.style.available
 plt.style.use("dark_background")
 
 
-def load_data():
+# 8.
+
+
+def load_college_data():
     college = pd.read_csv("data/College.csv", index_col=0).rename_axis("College")
     college["Elite"] = pd.cut(college["Top10perc"], [0, 50, 100], labels=["No", "Yes"])
     college["AcceptRate"] = college["Accept"] / college["Apps"]
     return college
 
 
-college = load_data()
+college = load_college_data()
 college.head()
-
-# 8.
 
 college = pd.read_csv("data/College.csv")
 college.head()
@@ -129,3 +131,95 @@ pd.plotting.scatter_matrix(college[["Grad.Rate", "AcceptRate", "Top10perc"]])
 plt.show()
 
 # 9.
+
+
+def load_auto_data():
+    auto = pd.read_csv("Auto.csv")
+    return auto
+
+
+auto = load_auto_data()
+np.unique(auto["horsepower"])
+
+# a. origin and name are the only qualitative variables.
+
+# b and c.
+
+# don't need to do this, just use `describe`
+for var in [
+    "mpg",
+    "cylinders",
+    "displacement",
+    "horsepower",
+    "weight",
+    "acceleration",
+    "year",
+]:
+    print(var)
+    min = np.min(auto[var])
+    max = np.max(auto[var])
+    print(f"{'range:':<10}{max - min:>8.2f}")
+    print(f"{'mean:':<10}{np.mean(auto[var]):>8.2f}")
+    print(f"{'std dev:':<10}{np.std(auto[var]):>8.2f}")
+    print()
+
+auto.describe()
+
+# desc is a dataframe
+desc = auto.describe()
+desc.loc["max", "mpg"] - desc.loc["min", "mpg"]
+
+range_values = desc.loc["max"] - desc.loc["min"]
+range_values
+
+# even simpler:
+# Method 1: Select only numeric columns
+range_values = (
+    auto.select_dtypes(include=["number"]).max()
+    - auto.select_dtypes(include=["number"]).min()
+)
+range_values
+
+# Method 2: Drop the 'name' column explicitly
+range_values = auto.drop("name", axis=1).max() - auto.drop("name", axis=1).min()
+range_values
+
+# d.
+
+auto[0:9]
+auto[85:]
+
+# wrong
+auto[0:9] + auto[85:]
+
+auto_new = pd.concat([auto[0:9], auto[85:]])
+
+auto_new.drop("name", axis=1).mean()
+auto_new.drop("name", axis=1).std()
+auto_new.drop("name", axis=1).max() - auto_new.drop("name", axis=1).min()
+
+# e.
+
+# strong correlations here
+pd.plotting.scatter_matrix(auto[["mpg", "cylinders", "displacement", "horsepower"]])
+plt.show()
+
+pd.plotting.scatter_matrix(auto[["mpg", "weight"]])
+plt.show()
+
+pd.plotting.scatter_matrix(auto[["mpg", "acceleration"]])
+plt.show()
+
+# steady improvements in mpg year over year
+pd.plotting.scatter_matrix(auto[["mpg", "year"]])
+plt.show()
+
+# muscle car era 💪
+pd.plotting.scatter_matrix(auto[["horsepower", "year"]])
+plt.show()
+
+pd.plotting.scatter_matrix(auto[["horsepower", "acceleration"]])
+plt.show()
+
+# f.
+# displacement, horsepower, cylinders, weight, year would be good variables because they show good explanatory power because they are correlated.
