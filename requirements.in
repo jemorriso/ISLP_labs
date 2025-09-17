@@ -1,4 +1,6 @@
+ipython
+ISLP
 matplotlib
+matplotlib-backend-kitty
 numpy
 pandas
-ipython

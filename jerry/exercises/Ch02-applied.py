@@ -1,6 +1,11 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from ISLP import load_data
+
+matplotlib.use("module://matplotlib-backend-kitty")
+plt.ion()
 
 plt.style.available
 plt.style.use("dark_background")
@@ -39,7 +44,7 @@ college.describe()
 college[["Top10perc", "Apps", "Enroll"]]
 
 pd.plotting.scatter_matrix(college[["Top10perc", "Apps", "Enroll"]])
-plt.show()
+# plt.show()
 
 # doesn't work properly with dark background
 plt.style.use("default")
@@ -211,7 +216,7 @@ pd.plotting.scatter_matrix(auto[["mpg", "acceleration"]])
 plt.show()
 
 # steady improvements in mpg year over year
-pd.plotting.scatter_matrix(auto[["mpg", "year"]])
+pd.plotting.scatter_matrix(auto[["mpg", "year"]], figsize=(12, 12))
 plt.show()
 
 # muscle car era 💪
@@ -223,3 +228,42 @@ plt.show()
 
 # f.
 # displacement, horsepower, cylinders, weight, year would be good variables because they show good explanatory power because they are correlated.
+
+# 10.
+
+# rows are suburbs, columns are housing values
+Boston = load_data("Boston")
+
+Boston.describe()
+Boston.head()
+
+len(Boston.columns)
+len(Boston)
+
+pd.plotting.scatter_matrix(Boston[["nox", "lstat"]])
+plt.show()
+
+pd.plotting.scatter_matrix(Boston[["crim", "lstat"]])
+plt.show()
+
+pd.plotting.scatter_matrix(Boston[["crim", "indus"]])
+plt.show()
+
+pd.plotting.scatter_matrix(Boston[["crim", "rm"]])
+plt.show()
+
+pd.plotting.scatter_matrix(Boston[["crim", "nox"]])
+plt.show()
+
+pd.plotting.scatter_matrix(Boston[["crim", "ptratio"]])
+plt.show()
+
+sum(Boston["chas"])
+
+# index label
+Boston["medv"].idxmin()
+# integer position
+Boston["medv"].argmin()
+
+Boston[Boston["rm"] > 7]
+Boston[Boston["rm"] > 8]
